@@ -1,0 +1,25 @@
+html,
+body {
+  padding: 20px;
+  background-color: gray;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #f1f1f1;
+}
+
+h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+}

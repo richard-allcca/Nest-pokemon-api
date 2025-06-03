@@ -1,0 +1,25 @@
+{
+  "cSpell.words": [
+    "Pokedex"
+  ],
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#e85677",
+    "activityBar.background": "#e85677",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#61e43b",
+    "activityBarBadge.foreground": "#15202b",
+    "commandCenter.border": "#e7e7e799",
+    "sash.hoverBorder": "#e85677",
+    "statusBar.background": "#e22953",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#e85677",
+    "statusBarItem.remoteBackground": "#e22953",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "titleBar.activeBackground": "#e22953",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#e2295399",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#e22953"
+}
