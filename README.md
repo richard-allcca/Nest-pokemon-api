@@ -1,8 +1,6 @@
 # Pokedex
 
-## Description
-
-Aplicación de ejemplo con NestJS que muestra un listado de Pokémon y sus detalles.
+API REST de ejemplo con NestJS que muestra un listado de Pokémon y sus detalles.
 
 ## Project start
 
@@ -12,15 +10,15 @@ $ npm install
 
 # start the application
 $ npm run start:dev
+
+# Inicializar la base de datos
+$ docker compose up -d
 ```
 
 ## Compile and run the project
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
+# watch mode development
 $ npm run start:dev
 
 # production mode
@@ -67,4 +65,56 @@ import { join } from 'path';
   ],
 })
 export class AppModule {}
+```
+
+## Comandos CLI
+
+```bash
+# generar un nuevo recurso (controlador, servicio y módulo)
+$ nest g resource <nombre>
+
+# generar un nuevo módulo
+$ nest g module <nombre>
+
+# generar un nuevo controlador
+$ nest g controller <nombre>
+
+# generar un nuevo servicio
+$ nest g service <nombre>
+
+# generar un nuevo guard
+$ nest g guard <nombre>
+
+# generar un nuevo interceptor
+$ nest g interceptor <nombre>
+
+# generar un nuevo pipe
+$ nest g pipe <nombre>
+
+# generar un nuevo proveedor
+$ nest g provider <nombre>
+
+# generar un nuevo DTO
+$ nest g dto <nombre>
+
+# generar un nuevo middleware
+$ nest g middleware <nombre>
+```
+
+## Agregar prefijo a las rutas
+
+Para agregar un prefijo a todas las rutas de la aplicación, se puede utilizar el método `setGlobalPrefix` en el archivo `main.ts`:
+
+```typescript
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.setGlobalPrefix('api/v2');
+
+  await app.listen(process.env.PORT ?? 3000);
+}
+void bootstrap();
 ```
