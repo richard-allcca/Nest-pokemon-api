@@ -1,7 +1,8 @@
 {
   "cSpell.words": [
     "nestjs",
-    "Pokedex"
+    "Pokedex",
+    "pokemons"
   ],
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#e85677",

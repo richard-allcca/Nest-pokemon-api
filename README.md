@@ -223,3 +223,27 @@ export class PokemonService {
   }
 };
 ```
+
+## Establecer un código de estado personalizado HTTP en las respuestas
+
+Para establecer el código de estado HTTP en las respuestas de los controladores, se puede utilizar el decorador `@HttpCode()`
+
+### Usando el decorador `@HttpCode()`
+
+```typescript
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import { PokemonService } from './pokemon.service';
+import { CreatePokemonDto } from './dto/create-pokemon.dto';
+import { UpdatePokemonDto } from './dto/update-pokemon.dto';
+
+@Controller('pokemon')
+export class PokemonController {
+  constructor(private readonly pokemonService: PokemonService) {}
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED) // Set the HTTP status code to 201 Created
+  create(@Body() createPokemonDto: CreatePokemonDto) {
+    return this.pokemonService.create(createPokemonDto);
+  }
+}
+```

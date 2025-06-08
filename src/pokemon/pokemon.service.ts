@@ -1,6 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { CreatePokemonDto } from './dto/create-pokemon.dto';
 import { UpdatePokemonDto } from './dto/update-pokemon.dto';
 import { Pokemon } from './entities/pokemon.entity';
@@ -13,30 +18,92 @@ export class PokemonService {
   ) {}
 
   async create(createPokemonDto: CreatePokemonDto): Promise<Pokemon> {
-    // INFO 1° método: usando el modelo directamente
-    // const { name, no } = createPokemonDto;
-    // const pokemon = new this.pokemonModel({ name, no });
-    // return pokemon.save();
+    try {
+      createPokemonDto.name = createPokemonDto.name.toLowerCase().trim();
 
-    // INFO 2° método: usando un método de modelo
-    const pokemon = await this.pokemonModel.create(createPokemonDto);
-    return pokemon;
+      // INFO 1° método: usando el modelo directamente
+      const pokemon = new this.pokemonModel(createPokemonDto);
+      return pokemon.save();
+
+      // INFO 2° método: usando un método de modelo
+      // const pokemon = await this.pokemonModel.create(createPokemonDto);
+      // return pokemon;
+    } catch (error) {
+      this.handleExceptions(error);
+    }
+    throw new InternalServerErrorException(
+      'Unexpected error during Pokemon creation',
+    );
   }
 
   findAll() {
-    return `This action returns all pokemon`;
+    // Returning all pokemons from the database
+    return this.pokemonModel.find().sort({ no: 1 });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} pokemon`;
+  async findOne(term: string) {
+    let pokemon: Pokemon | null = null;
+
+    // INFO: Validating if term is a number
+    if (!isNaN(+term)) {
+      pokemon = await this.pokemonModel.findOne({ no: +term });
+    }
+
+    // INFO: Validating if term is a valid MongoDB ObjectId
+    if (!pokemon && isValidObjectId(term)) {
+      pokemon = await this.pokemonModel.findById(term);
+    }
+
+    // INFO: Validating if term is a string
+    if (!pokemon && isNaN(+term)) {
+      pokemon = await this.pokemonModel.findOne({
+        name: term.toLowerCase().trim(),
+      });
+    }
+
+    if (!pokemon)
+      throw new NotFoundException(
+        `Pokemon with id, name or no ${term} not found`,
+      );
+
+    return pokemon;
   }
 
-  update(id: number, updatePokemonDto: UpdatePokemonDto) {
-    // Implementation for updating a Pokemon will go here in the future
-    return `This action updates a #${id} pokemon`;
+  async update(term: string, updatePokemonDto: UpdatePokemonDto) {
+    const pokemon = await this.findOne(term);
+
+    if (updatePokemonDto.name)
+      updatePokemonDto.name = updatePokemonDto.name.toLowerCase().trim();
+
+    try {
+      return await this.pokemonModel.findByIdAndUpdate(
+        pokemon.id,
+        updatePokemonDto,
+        {
+          new: true,
+        },
+      );
+    } catch (error) {
+      this.handleExceptions(error);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} pokemon`;
+  async remove(term: string) {
+    const pokemon = await this.findOne(term);
+    return await this.pokemonModel.findByIdAndDelete(pokemon.id);
+  }
+
+  private handleExceptions(error: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (error.code === 11000) {
+      throw new BadRequestException(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        `Pokemon in db ${JSON.stringify(error.keyValue)} already exists`,
+      );
+    }
+    console.log(error);
+    throw new InternalServerErrorException(
+      `Can't create Pokemon - Check server logs`,
+    );
   }
 }
