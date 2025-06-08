@@ -118,3 +118,108 @@ async function bootstrap() {
 }
 void bootstrap();
 ```
+
+## Conexión a la base de datos mongo con Mongoose y @nestjs/mongoose
+
+[Documentación oficial para trabajar con MongoDB](https://docs.nestjs.com/techniques/mongodb)
+
+Para conectar la aplicación a una base de datos MongoDB utilizando Mongoose y el paquete `@nestjs/mongoose`, se deben seguir los siguientes pasos:
+
+1. Instalar las dependencias necesarias:
+
+```bash
+npm install @nestjs/mongoose mongoose
+```
+
+2. Importar el módulo `MongooseModule` en el archivo `app.module.ts` y configurar la conexión a la base de datos:
+
+```typescript
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
+@Module({
+  imports: [
+    MongooseModule.forRoot('mongodb://localhost/nest'),
+  ],
+})
+export class AppModule {}
+```
+
+3. Crear un esquema de Mongoose para definir la estructura de los documentos en la colección:
+
+```typescript
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+
+@Schema()
+export class Pokemon extends Document {
+  @Prop({
+    unique: true,
+    index: true,
+  })
+  name: string;
+
+  @Prop({
+    unique: true,
+    index: true,
+  })
+  no: number;
+}
+
+export const PokemonSchema = SchemaFactory.createForClass(Pokemon);
+```
+
+4. Importar el esquema en el módulo correspondiente y registrar el modelo:
+
+```typescript
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Pokemon, PokemonSchema } from './pokemon.entity';
+
+@Module({
+  imports: [
+    MongooseModule.forFeature([
+      {
+        name: Pokemon.name,
+        schema: PokemonSchema,
+      },
+    ]),
+  ],
+})
+export class PokemonModule {}
+```
+
+5. Inyectar el modelo en el servicio o controlador donde se necesite utilizarlo:
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Pokemon } from './pokemon.schema';
+
+@Injectable()
+export class PokemonService {
+  constructor(@InjectModel(Pokemon.name) private pokemonModel: Model<Pokemon>) {}
+
+  async create(createPokemonDto: CreatePokemonDto): Promise<Pokemon> {
+    const createdPokemon = new this.pokemonModel(createPokemonDto);
+    return createdPokemon.save();
+  }
+
+  async findAll(): Promise<Pokemon[]> {
+    return this.pokemonModel.find().exec();
+  }
+
+  async findOne(id: string): Promise<Pokemon> {
+    return this.pokemonModel.findById(id).exec();
+  }
+
+  async update(id: string, updatePokemonDto: UpdatePokemonDto): Promise<Pokemon> {
+    return this.pokemonModel.findByIdAndUpdate(id, updatePokemonDto, { new: true }).exec();
+  }
+
+  async delete(id: string): Promise<Pokemon> {
+    return this.pokemonModel.findByIdAndDelete(id).exec();
+  }
+};
+```
