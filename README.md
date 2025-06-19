@@ -69,6 +69,8 @@ export class AppModule {}
 
 ## Comandos CLI
 
+Puedes utilizar al final de los comandos la bandera `--no-spec` para evitar la generación de archivos de pruebas unitarias.
+
 ```bash
 # generar un nuevo recurso (controlador, servicio y módulo)
 $ nest g resource <nombre>
