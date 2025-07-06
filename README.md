@@ -28,6 +28,31 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Note about modules
+
+> Todas las carpetas dentro de `src` tienen módulos y en estos se debe registrar los controladores, servicios y demás clases para que se puedan utilizar, de lo contrario no funcionarán y si se necesita `importar` un módulo en otro, se debe hacer a través de la propiedad `imports` del decorador `@Module`.
+
+Como ejemplo toma el módulo `CommonModule`, que se encarga de proporcionar los adaptadores HTTP. Este módulo debe ser importado en cualquier otro módulo que necesite utilizar estos adaptadores.
+
+```typescript
+@Module({
+  providers: [AxiosAdapter, FetchAdapter], // Registering the adapters as providers
+  exports: [AxiosAdapter, FetchAdapter], // Exporting the adapters for use in other modules
+})
+export class CommonModule {}
+```
+
+## Note about Injection
+
+Para inyectar un adaptador HTTP en un servicio, primero debes asegurarte de que el adaptador esté registrado como proveedor en el módulo correspondiente y declarado en `exports`. Luego, puedes inyectarlo directamente en el constructor del servicio.
+
+```typescript
+@Injectable()
+export class SomeService {
+  constructor(private readonly httpClient: AxiosAdapter) {}
+}
+```
+
 ## Fix problems with CRLF nd LF
 
 ```bash
