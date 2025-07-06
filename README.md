@@ -13,6 +13,9 @@ $ npm run start:dev
 
 # Inicializar la base de datos
 $ docker compose up -d
+
+# Llenar la base de datos con datos de ejemplo
+http://localhost:3000/api/v2/seed
 ```
 
 ## Compile and run the project

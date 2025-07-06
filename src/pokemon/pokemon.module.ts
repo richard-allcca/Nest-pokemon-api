@@ -15,5 +15,7 @@ import { PokemonService } from './pokemon.service';
       },
     ]),
   ],
+  // exports: [PokemonService], // Exporting PokemonService to be used in other modules
+  exports: [MongooseModule], // Exporting MongooseModule to be used in other modules
 })
 export class PokemonModule {}
