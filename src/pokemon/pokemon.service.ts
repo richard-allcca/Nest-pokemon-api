@@ -36,9 +36,14 @@ export class PokemonService {
     );
   }
 
-  findAll() {
-    // Returning all pokemons from the database
-    return this.pokemonModel.find().sort({ no: 1 });
+  findAll(queryParameters: { limit?: number; offset?: number }) {
+    const { limit = 10, offset = 0 } = queryParameters;
+    return this.pokemonModel
+      .find() // Find all Pokemon documents
+      .limit(limit) // Limit the number of results returned
+      .skip(offset) // Skip the first 'offset' results
+      .sort({ no: 1 }) // Sorting by 'no' field '1' for ascending order
+      .select('-__v'); // Exclude the __v field from the result
   }
 
   async findOne(term: string) {

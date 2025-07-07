@@ -149,6 +149,82 @@ async function bootstrap() {
 void bootstrap();
 ```
 
+## Configuración de validación de datos con Pipes
+
+Para configurar la validación de datos en NestJS, se utiliza el paquete `class-validator` junto con `class-transformer`. Estos paquetes permiten definir reglas de validación en los DTOs (Data Transfer Objects) y aplicar estas validaciones automáticamente a las solicitudes entrantes.
+
+También, se puede utilizar el decorador `@UsePipes()` para aplicar validaciones específicas en los controladores.
+
+Además, se puede configurar la validación globalmente en el archivo `main.ts` utilizando el `ValidationPipe`.
+
+Para instalar las dependencias necesarias, ejecuta el siguiente comando:
+
+```bash
+npm install class-validator class-transformer
+```
+
+Luego, puedes definir un DTO con las validaciones necesarias:
+
+```typescript
+import { IsString, IsInt, IsPositive } from 'class-validator';
+
+export class CreatePokemonDto {
+  @IsString()
+  name: string;
+
+  @IsInt()
+  @IsPositive()
+  no: number;
+}
+```
+
+Luego, en el controlador, puedes utilizar el DTO como tipo de parámetro y aplicar el `ValidationPipe`:
+
+```typescript
+import { Controller, Post, Body, UsePipes, ValidationPipe } from '@nestjs/common';
+import { CreatePokemonDto } from './dto/create-pokemon.dto';
+import { PokemonService } from './pokemon.service';
+
+@Controller('pokemon')
+export class PokemonController {
+  constructor(private readonly pokemonService: PokemonService) {}
+
+  @Post()
+  @UsePipes(ValidationPipe)
+  create(@Body() createPokemonDto: CreatePokemonDto) {
+    return this.pokemonService.create(createPokemonDto);
+  }
+}
+```
+
+ó puedes configurar la validación globalmente en el archivo `main.ts`:
+
+```typescript
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.setGlobalPrefix('api/v2');
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Automatically remove properties that do not have decorators
+      forbidNonWhitelisted: true, // Throw an error if non-whitelisted properties are present
+      transform: true, // Automatically transform payloads to DTO instances
+      transformOptions: {
+        enableImplicitConversion: true, // Allow implicit conversion of types (e.g., string to number)
+      },
+    }),
+  );
+
+  await app.listen(process.env.PORT ?? 3000);
+}
+void bootstrap();
+```
+
 ## Conexión a la base de datos mongo con Mongoose y @nestjs/mongoose
 
 [Documentación oficial para trabajar con MongoDB](https://docs.nestjs.com/techniques/mongodb)
